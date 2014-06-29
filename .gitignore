@@ -1,0 +1,4 @@
+node_modules
+output
+nom-debug.log
+coverage

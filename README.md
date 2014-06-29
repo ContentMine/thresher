@@ -17,7 +17,7 @@ Thresher
 [codeclimate]: https://codeclimate.com/github/ContentMine/thresher
 [downloads]: https://nodei.co/npm/thresher
 
-**Thresh** is a library for modern web scraping in Node.js. It is unique in that:
+**Thresher** is a library for modern web scraping in Node.js. It is unique in that:
 
 - it is *headless*: URLs are rendered in a GUI-less browser, meaning the version of the HTML you scrape is the same one visitors would see on their screen
 - it is *declarative*: Scrapers are defined in separate JSON files. This mean no programming required! It also means any other software supporting the same format could use the same scraper definitions.

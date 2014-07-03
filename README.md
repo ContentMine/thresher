@@ -25,13 +25,15 @@ Thresher
 Thresher was developed as part of the [ContentMine](http://contentmine.org) stack for mining the academic literature.
 
 
-# Installation
-
-`thresher` is very easy to install. Simply:
+## Installation
 
 ```bash
 npm install --save thresher
 ```
+
+## Usage
+
+See [quickscrape](https://github.com/ContentMine/quickscrape) for a thorough exmaple of thresher in action.
 
 ## Contributing
 
@@ -39,7 +41,9 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 
 ## Release History
 
-- ***0.1.0*** - fork thresher from quickscrape
+- ***0.0.1*** - fork thresher from quickscrape
+  ***0.0.2*** - solve the dependency problem by exposing binaries from installed packages
+  ***0.0.3*** - fix rendering issue on some websites
 
 ## License
 Copyright (c) 2014 Richard Smith-Unna  

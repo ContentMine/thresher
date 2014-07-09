@@ -1,0 +1,9 @@
+{
+  "url": "teeny\\.html",
+  "name": "test3",
+  "elements": {
+    "xmlns": {
+        "selector": "/html/xmlns"
+      }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "url": "tiny",
+  "name": "test1",
+  "elements": {
+    "xmlns": {
+        "selector": "/html/xmlns"
+      }
+  }
+}

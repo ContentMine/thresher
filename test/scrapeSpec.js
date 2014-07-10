@@ -1,6 +1,6 @@
 var scrape = require('../lib/scrape.js');
 var should = require('should');
-var express = require('express');
+// var express = require('express');
 
 describe("scrape", function() {
 

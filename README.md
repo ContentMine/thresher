@@ -45,6 +45,7 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
   ***0.0.2*** - solve the dependency problem by exposing binaries from installed packages
   ***0.0.3*** - fix rendering issue on some websites
   ***0.0.4*** - automatic scraper selection
+  ***0.0.5*** - fix bug in ScraperBox for multiple matches
 
 ## License
 Copyright (c) 2014 Richard Smith-Unna  

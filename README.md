@@ -48,5 +48,5 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 - ***0.0.5*** - fix bug in ScraperBox for multiple matches
 
 ## License
-Copyright (c) 2014 Richard Smith-Unna  
+Copyright (c) 2014 [Shuttleworth Foundation](https://www.shuttleworthfoundation.org/). 
 Licensed under the MIT license.

@@ -20,7 +20,7 @@ Thresher
 **Thresher** is a library for modern web scraping in Node.js. It is unique in that:
 
 - it is *headless*: URLs are rendered in a GUI-less browser, meaning the version of the HTML you scrape is the same one visitors would see on their screen
-- it is *declarative*: Scrapers are defined in separate JSON files. This mean no programming required! It also means any other software supporting the same format could use the same scraper definitions.
+- it is *declarative*: Scrapers are defined in separate JSON files. This means no programming required! It also means any other software supporting the same format could use the same scraper definitions.
 
 Thresher was developed as part of the [ContentMine](http://contentmine.org) stack for mining the academic literature.
 
@@ -42,10 +42,10 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 ## Release History
 
 - ***0.0.1*** - fork thresher from quickscrape
-  ***0.0.2*** - solve the dependency problem by exposing binaries from installed packages
-  ***0.0.3*** - fix rendering issue on some websites
-  ***0.0.4*** - automatic scraper selection
-  ***0.0.5*** - fix bug in ScraperBox for multiple matches
+- ***0.0.2*** - solve the dependency problem by exposing binaries from installed packages
+- ***0.0.3*** - fix rendering issue on some websites
+- ***0.0.4*** - automatic scraper selection
+- ***0.0.5*** - fix bug in ScraperBox for multiple matches
 
 ## License
 Copyright (c) 2014 Richard Smith-Unna  

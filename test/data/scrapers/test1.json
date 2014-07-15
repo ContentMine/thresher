@@ -3,7 +3,8 @@
   "name": "test1",
   "elements": {
     "xmlns": {
-        "selector": "/html/xmlns"
-      }
+      "selector": "/html",
+      "attribute": "xmlns"
+    }
   }
 }

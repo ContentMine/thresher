@@ -6,7 +6,7 @@ describe("url", function() {
   describe(".checkUrl()", function() {
 
     it("should reject an invalid URL", function() {
-      var urls = ["http://nsnkfnaksfasfkn33",
+      var urls = ["http://nsnkfnaksfasfkn33!!",
                   "blereehahsd.9:1",
                   "fake://url"];
       for (var i in urls) {
@@ -150,7 +150,7 @@ describe("url", function() {
 describe(".relativeToAbsolute()", function() {
 
   it("should correctly convert relative URLs to absolute", function() {
-    var urls = ["http://nsnkfnaksfasfkn33",
+    var urls = ["http://nsnkfnaksfasfkn33!!",
                 "blereehahsd.9:1",
                 "fake://url"];
     for (var i in urls) {

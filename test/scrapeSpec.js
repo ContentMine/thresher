@@ -11,24 +11,7 @@ describe("scrape", function() {
 
   describe(".scrape()", function() {
 
-    this.timeout(5000);
-
-    // it("should fail gracefully when a connection can't be made", function(done) {
-    //   var def = {
-    //     url: 'localhost',
-    //     elements: {
-    //       fake: '/element'
-    //     }
-    //   };
-    //   var thresher = new Thresher();
-    //   (function() {
-    //     thresher.scrape('http://localhost:' +
-    //                     MOCKPORT +
-    //                     '/nonexistant.html',
-    //                   def);
-    //   }).should.throw();
-    //   thresher.on('error', done);
-    // });
+    this.timeout(20000);
 
     it("should extract simple XPaths", function(done) {
       var url = 'http://localhost:' + MOCKPORT + '/data/tiny.html';
@@ -55,14 +38,6 @@ describe("scrape", function() {
         fs.existsSync('schema.xml').should.be.ok;
         done();
       });
-    });
-
-    it("should handle multiple selector hits", function() {
-      // false.should.be.ok;
-    });
-
-    it("should callback on completion", function() {
-      // false.should.be.ok;
     });
 
   });

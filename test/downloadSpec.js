@@ -26,8 +26,8 @@ describe("download", function() {
         var resUrl = '/data/tiny.html'
         var scrapeUrl = 'http://localhost:' + MOCKPORT
         var rename = null;
-        var down = dl.downloadResource(resUrl, scrapeUrl, rename);
-        down.on('close', function() {
+        var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        down.on('downloadComplete', function() {
           fs.existsSync('tiny.html').should.be.ok;
           done();
         });
@@ -48,8 +48,8 @@ describe("download", function() {
         var resUrl = 'http://localhost:' + MOCKPORT + '/data/tiny2.html'
         var scrapeUrl = 'http://localhost:' + MOCKPORT
         var rename = null;
-        var down = dl.downloadResource(resUrl, scrapeUrl, rename);
-        down.on('close', function() {
+        var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        down.on('downloadComplete', function() {
           fs.existsSync('tiny2.html').should.be.ok;
           fs.unlink('tiny2.html', function (err) {
             if (err) throw err;
@@ -73,8 +73,8 @@ describe("download", function() {
         var resUrl = 'data/tiny.html'
         var scrapeUrl = 'http://localhost:' + MOCKPORT
         var rename = 'blimey.html';
-        var down = dl.downloadResource(resUrl, scrapeUrl, rename);
-        down.on('close', function() {
+        var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        down.on('downloadComplete', function() {
           fs.existsSync('blimey.html').should.be.ok;
           done();
         });
@@ -91,7 +91,7 @@ describe("download", function() {
 
     it("should reject a null URL", function() {
       (function() {
-        dl.downloadResource(resUrl, scrapeUrl, rename);
+        dl.downloadResource(resUrl, scrapeUrl, rename, null);
       }).should.throw();
     });
 

@@ -39,7 +39,8 @@
     "download": "~0.1.17",
     "xpath": "0.0.6",
     "winston": "~0.7.3",
-    "which": "~1.0.5"
+    "which": "~1.0.5",
+    "request": "~2.37.0"
   },
   "devDependencies": {
     "coveralls": "~2.10.0",

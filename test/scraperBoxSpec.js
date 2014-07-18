@@ -55,6 +55,13 @@ describe("ScraperBox", function() {
 
     it("should find the most specific scraper", function() {
       var s = new ScraperBox(__dirname + '/data/scrapers');
+      (function() {
+        s.getScraper('http://undefined.com');
+      }).should.throw;
+    });
+
+    it("should fail gracefully if no scraper is found", function(){
+      var s = new ScraperBox(__dirname + '/data/scrapers');
       var res = s.getScraper('http://address.com/tiny.html');
       res.name.should.be.exactly("test2");
     });

@@ -19,9 +19,9 @@ describe("Ticker", function() {
     });
 
     it("should fail to init if length is not supplied", function() {
-        (function() {
-          var t = new Ticker();
-        }).should.throwError(/^Ticker requires a length/);
+      (function() {
+        var t = new Ticker();
+      }).should.throwError(/^Ticker requires a length/);
     });
 
   });

@@ -49,7 +49,7 @@ describe("ScraperBox", function() {
 
     it("should find unique scrapers matching a URL", function() {
       var s = new ScraperBox(__dirname + '/data/scrapers');
-      var res = s.getScraper('http://address.com/teeny.html');
+      var res = s.getScraper('http://address.com/regex.html');
       res.name.should.be.exactly("test3");
     });
 

@@ -1,9 +1,11 @@
 {
-  "url": "teeny\\.html",
+  "url": "regex\\.html",
   "name": "test3",
   "elements": {
-    "xmlns": {
-        "selector": "/html/xmlns"
-      }
+    "answer": {
+      "selector": "//h1",
+      "attribute": "text",
+      "regex": "(\\w+)\\s(\\w+)"
+    }
   }
 }

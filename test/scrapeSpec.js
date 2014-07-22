@@ -3,24 +3,17 @@ var Thresher = require('../lib/thresher.js'),
     should = require('should'),
     fs = require('fs'),
     path = require('path'),
-    MOCKPORT = 30046,
+    mockport = 1,
     mockserver = null,
     http = require('http');
-
-log = {
-  info: function(){},
-  data: function(){},
-  warn: function(){},
-  error: function(){},
-  debug: function(){}
-};
 
 describe("scrape", function() {
 
   before(function(done) {
     this.timeout(10000);
-    mockserver = require('./mockserver').app.listen(MOCKPORT);
+    mockserver = require('./mockserver').app.listen();
     mockserver.on('listening', function() {
+      mockport = mockserver.address().port;
       done();
     });
   });
@@ -28,7 +21,7 @@ describe("scrape", function() {
   describe(".scrape()", function() {
 
     it("should extract simple XPaths", function(done) {
-      var url = 'http://localhost:' + MOCKPORT + '/data/tiny.html';
+      var url = 'http://localhost:' + mockport + '/data/tiny.html';
       var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
       var def = ss.getScraper(url);
       var thresher = new Thresher();
@@ -39,8 +32,21 @@ describe("scrape", function() {
       });
     });
 
+    it("should extract regexes", function(done) {
+      var url = 'http://localhost:' + mockport + '/data/regex.html';
+      var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
+      var def = ss.getScraper(url);
+      var thresher = new Thresher();
+      thresher.scrape(url, def.elements, false);
+      thresher.on('elementCaptured', function(data) {
+        data.answer[0].should.be.exactly("regex");
+        data.answer[1].should.be.exactly("success");
+        done();
+      });
+    });
+
     it("should download resources", function(done) {
-      var url = 'http://localhost:' + MOCKPORT + '/data/tiny.html';
+      var url = 'http://localhost:' + mockport + '/data/tiny.html';
       var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
       var def = ss.getScraper(url);
       def.elements.xmlns.download = { rename: 'schema.xml' };

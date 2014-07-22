@@ -46,7 +46,9 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 - ***0.0.3*** - fix rendering issue on some websites
 - ***0.0.4*** - automatic scraper selection
 - ***0.0.5*** - fix bug in ScraperBox for multiple matches
+  ***0.0.6*** - refactor, headless rendering optional, multiple URLs, automatic scraper selection
+  ***0.0.7*** - support scraperJSON v0.0.2: add regex capability, remove all logging, move to event-based design
 
 ## License
-Copyright (c) 2014 [Shuttleworth Foundation](https://www.shuttleworthfoundation.org/). 
+Copyright (c) 2014 [Shuttleworth Foundation](https://www.shuttleworthfoundation.org/).
 Licensed under the MIT license.

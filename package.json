@@ -36,7 +36,6 @@
     "jsdom": "~0.11.0",
     "phantomjs": "~1.9.7-12",
     "request": "~2.37.0",
-    "resolver": "^0.1.12",
     "shelljs": "~0.3.0",
     "spooky": "~0.2.4",
     "which": "~1.0.5",

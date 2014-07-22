@@ -1,5 +1,6 @@
-var url = require('../lib/url.js');
-var should = require('should');
+var url = require('../lib/url.js'),
+    should = require('should'),
+    request = require('request');
 
 describe("url", function() {
 
@@ -19,11 +20,10 @@ describe("url", function() {
 
     it("should resolve redirects", function(done) {
       var toresolve = "http://localhost:" + mockport + "/redirect";
-      console.log(toresolve);
-      var target = "http://localhost:" + mockport + "/target";
-      console.log(target);
+      var target = "http://localhost:" + mockport + "/data/tiny.html";
       url.resolveRedirects(toresolve, function(err, resolved){
         if (err) {
+          console.log(err);
           throw err;
         }
         resolved.should.be.exactly(target);

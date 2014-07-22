@@ -37,8 +37,7 @@ app.get('/bigpage', function(req, res){
 
 //redirect
 app.get('/redirect', function(req, res){
-  console.log(req);
-  res.redirect('/target');
+  res.redirect('/data/tiny.html');
 });
 
 app.use(express.static(__dirname, '/data'));

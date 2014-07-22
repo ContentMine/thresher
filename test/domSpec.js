@@ -48,7 +48,7 @@ describe("dom", function() {
         var src = data.toString('utf-8');
         var html = dom.render(src).childNodes[0];
         var attr = dom.getAttribute(html, 'xmlns');
-        attr.should.equal('http://www.w3.org/1999/xhtml');
+        attr.should.equal('/data/tiny2.html');
         done();
       });
     });

@@ -27,7 +27,7 @@ describe("scrape", function() {
       var thresher = new Thresher();
       thresher.scrape(url, def.elements, false);
       thresher.on('elementCaptured', function(data) {
-        data.xmlns.should.be.exactly("http://www.w3.org/1999/xhtml");
+        data.xmlns.should.be.exactly("/data/tiny2.html");
         done();
       });
     });
@@ -56,6 +56,7 @@ describe("scrape", function() {
         fs.existsSync('schema.xml').should.be.ok;
         done();
       });
+      thresher.on('downloadStarted', function(){ console.log('started'); });
     });
 
   });

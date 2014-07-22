@@ -1,4 +1,4 @@
-var dl = require('../lib/download.js');
+var Downloader = require('../lib/download.js');
 var fs = require('fs');
 var should = require('should');
 var temp = require('temp');
@@ -28,7 +28,8 @@ describe("download", function() {
         var resUrl = '/data/tiny.html'
         var scrapeUrl = 'http://localhost:' + mockport
         var rename = null;
-        var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        var down = new Downloader();
+        down.downloadResource(resUrl, scrapeUrl, rename, null);
         down.on('downloadComplete', function() {
           fs.existsSync('tiny.html').should.be.ok;
           done();
@@ -50,7 +51,8 @@ describe("download", function() {
         var resUrl = 'http://localhost:' + mockport + '/data/tiny2.html'
         var scrapeUrl = 'http://localhost:' + mockport
         var rename = null;
-        var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        var down = new Downloader();
+        down.downloadResource(resUrl, scrapeUrl, rename, null);
         down.on('downloadComplete', function() {
           fs.existsSync('tiny2.html').should.be.ok;
           fs.unlink('tiny2.html', function (err) {
@@ -75,7 +77,8 @@ describe("download", function() {
         var resUrl = 'data/tiny.html'
         var scrapeUrl = 'http://localhost:' + mockport
         var rename = 'blimey.html';
-        var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        var down = new Downloader();
+        down.downloadResource(resUrl, scrapeUrl, rename, null);
         down.on('downloadComplete', function() {
           fs.existsSync('blimey.html').should.be.ok;
           done();
@@ -93,7 +96,8 @@ describe("download", function() {
 
     it("should reject a null URL", function() {
       (function() {
-        dl.downloadResource(resUrl, scrapeUrl, rename, null);
+        var down = new Downloader();
+        down.downloadResource(resUrl, scrapeUrl, rename, null);
       }).should.throw();
     });
 

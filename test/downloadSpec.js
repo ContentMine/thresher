@@ -6,17 +6,19 @@ temp.track();
 
 require('shelljs/global');
 
-log = {
-  info: function(){},
-  warn: function(){},
-  error: function(){},
-  debug: function(){}
-};
-
-var MOCKPORT = 30045
-var mockserver = require('./mockserver').app.listen(MOCKPORT);
+var mockport = 1
+var mockserver = null;
 
 describe("download", function() {
+
+  before(function(done) {
+    this.timeout(10000);
+    mockserver = require('./mockserver').app.listen();
+    mockserver.on('listening', function() {
+      mockport = mockserver.address().port;
+      done();
+    });
+  });
 
   describe("downloadResource()", function() {
 
@@ -24,7 +26,7 @@ describe("download", function() {
       temp.mkdir('download', function(err, dirPath) {
         cd(dirPath);
         var resUrl = '/data/tiny.html'
-        var scrapeUrl = 'http://localhost:' + MOCKPORT
+        var scrapeUrl = 'http://localhost:' + mockport
         var rename = null;
         var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
         down.on('downloadComplete', function() {
@@ -45,8 +47,8 @@ describe("download", function() {
     it("should handle absolute URLs", function(done) {
       temp.mkdir('download', function(err, dirPath) {
         cd(dirPath);
-        var resUrl = 'http://localhost:' + MOCKPORT + '/data/tiny2.html'
-        var scrapeUrl = 'http://localhost:' + MOCKPORT
+        var resUrl = 'http://localhost:' + mockport + '/data/tiny2.html'
+        var scrapeUrl = 'http://localhost:' + mockport
         var rename = null;
         var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
         down.on('downloadComplete', function() {
@@ -71,7 +73,7 @@ describe("download", function() {
       temp.mkdir('download', function(err, dirPath) {
         cd(dirPath);
         var resUrl = 'data/tiny.html'
-        var scrapeUrl = 'http://localhost:' + MOCKPORT
+        var scrapeUrl = 'http://localhost:' + mockport
         var rename = 'blimey.html';
         var down = dl.downloadResource(resUrl, scrapeUrl, rename, null);
         down.on('downloadComplete', function() {

@@ -31,16 +31,17 @@
     "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "dependencies": {
-    "phantomjs": "~1.9.7-12",
     "casperjs": "~1.1.0-beta3",
+    "download": "~0.1.17",
+    "jsdom": "~0.11.0",
+    "phantomjs": "~1.9.7-12",
+    "request": "~2.37.0",
+    "resolver": "^0.1.12",
     "shelljs": "~0.3.0",
     "spooky": "~0.2.4",
-    "jsdom": "~0.11.0",
-    "download": "~0.1.17",
-    "xpath": "0.0.6",
-    "winston": "~0.7.3",
     "which": "~1.0.5",
-    "request": "~2.37.0"
+    "winston": "~0.7.3",
+    "xpath": "0.0.6"
   },
   "devDependencies": {
     "coveralls": "~2.10.0",

@@ -35,6 +35,12 @@ app.get('/bigpage', function(req, res){
   res.send("<html><body>"+bigpage+"</body></html>");
 });
 
+//redirect
+app.get('/redirect', function(req, res){
+  console.log(req);
+  res.redirect('/target');
+});
+
 app.use(express.static(__dirname, '/data'));
 
 exports.app = app;

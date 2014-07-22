@@ -3,6 +3,35 @@ var should = require('should');
 
 describe("url", function() {
 
+  describe(".resolveRedirects()", function() {
+
+    var mockserver = null,
+        mockport = null;
+
+    before(function(done) {
+      this.timeout(10000);
+      mockserver = require('./mockserver').app.listen();
+      mockserver.on('listening', function() {
+        mockport = mockserver.address().port;
+        done();
+      });
+    });
+
+    it("should resolve redirects", function(done) {
+      var toresolve = "http://localhost:" + mockport + "/redirect";
+      console.log(toresolve);
+      var target = "http://localhost:" + mockport + "/target";
+      console.log(target);
+      url.resolveRedirects(toresolve, function(err, resolved){
+        if (err) {
+          throw err;
+        }
+        resolved.should.be.exactly(target);
+        done();
+      });
+    });
+  });
+
   describe(".checkUrl()", function() {
 
     it("should reject an invalid URL", function() {

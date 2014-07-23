@@ -7,7 +7,7 @@ var Thresher = require('../lib/thresher.js'),
     mockserver = null,
     http = require('http');
 
-describe("scrape", function() {
+describe("Thresher", function() {
 
   before(function(done) {
     this.timeout(10000);

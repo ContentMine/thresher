@@ -1,11 +1,5 @@
-var ScraperBox = require('../lib/scraperBox.js');
-var should = require('should');
-log = {
-  info: function(){},
-  warn: function(){},
-  error: function(){},
-  debug: function(){}
-};
+var ScraperBox = require('../lib/scraperBox.js'),
+    should = require('should');
 
 describe("ScraperBox", function() {
 
@@ -40,7 +34,9 @@ describe("ScraperBox", function() {
           this: "should not work"
         }
       };
-      new ScraperBox().addScraper(s).should.not.be.ok;
+      var sb = new ScraperBox();
+      sb.on('error', function() {} );
+      sb.addScraper(s).should.not.be.ok;
     });
 
   });
@@ -53,14 +49,14 @@ describe("ScraperBox", function() {
       res.name.should.be.exactly("test3");
     });
 
-    it("should find the most specific scraper", function() {
+    it("should fail gracefully if no scraper is found", function() {
       var s = new ScraperBox(__dirname + '/data/scrapers');
       (function() {
         s.getScraper('http://undefined.com');
       }).should.throw;
     });
 
-    it("should fail gracefully if no scraper is found", function(){
+    it("should find the most specific scraper", function(){
       var s = new ScraperBox(__dirname + '/data/scrapers');
       var res = s.getScraper('http://address.com/tiny.html');
       res.name.should.be.exactly("test2");

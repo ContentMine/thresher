@@ -1,6 +1,7 @@
 var Scraper = require('../lib/scraper.js'),
     should = require('should'),
-    fs = require('fs');
+    fs = require('fs'),
+    dom = require('../lib/dom.js');
 
 describe("Scraper", function() {
 
@@ -71,6 +72,82 @@ describe("Scraper", function() {
         scraper.matchesURL(urls[i]).should.not.be.ok;
       }
     });
+
+  });
+
+  describe(".annotateFollows()", function() {
+    it("should add followme to elements that are followed", function() {
+      var def = {
+        name: 'testFollow',
+        url: "\\.+",
+        elements: {
+          one: {
+            selector: "/a",
+            attribute: "href"
+          },
+          two: {
+            selector: "/h1",
+            follow: "one"
+          }
+        }
+      }
+      var scraper = new Scraper(def);
+      scraper.loadElements();
+      scraper.annotateFollows();
+      scraper.elements.one.followme.should.be.ok;
+    });
+  });
+
+  describe(".loadElements()", function() {
+    it("should flatten the element tree", function() {
+      var def = {
+        name: 'testFollow',
+        url: "\\.+",
+        elements: {
+          one: {
+            selector: "/a",
+          },
+          two: {
+            selector: "/h1",
+          }
+        }
+      }
+      var scraper = new Scraper(def);
+      scraper.loadElements();
+      scraper.elementsArray.length.should.be.exactly(2);
+    });
+  });
+
+  describe(".scrapeDoc()", function() {
+    it("should work", function(done) {
+      var html = fs.readFileSync(__dirname + '/data/tiny.html', 'utf8')
+      var doc = dom.render(html);
+      var def = JSON.parse(fs.readFileSync(__dirname +
+                                          '/data/scrapers/test1.json',
+                                          'utf8'));
+                                          var scraper = new Scraper(def);
+      scraper.scrapeDoc(doc).length.should.be.exactly(1);
+      done();
+    });
+  });
+
+  describe(".startTicker()", function() {
+
+  });
+
+  describe(".scrapeElement()", function() {
+
+  });
+
+  describe(".downloadElement()", function() {
+
+  });
+
+  describe(".runRegex()", function() {
+
+  });
+
+  describe(".makeSubScraper()", function() {
 
   });
 

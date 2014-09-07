@@ -1,0 +1,17 @@
+{
+  "url": "\\w+",
+  "name": "followOn example",
+  "followables": {
+    "xmlns": {
+      "selector": "//html",
+      "attribute": "xmlns"
+    }
+  },
+  "elements" : {
+    "inputName": {
+      "follow": "xmlns",
+      "selector": "//input",
+      "attribute": "name"
+    }
+  }
+}

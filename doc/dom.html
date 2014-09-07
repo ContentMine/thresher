@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en"><head><title>dom</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="dom"><meta name="groc-project-path" content="lib/dom.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/dom.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><p>tools for rendering the DOM and
+manipulating DOM nodes</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>jsdom lets us re-render the DOM from raw HTML</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">jsdom</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;jsdom-little&#39;</span><span class="p">).</span><span class="nx">jsdom</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>xpath lets us use xpath selectors on the rendered DOM</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">xpath</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;xpath&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">dom</span> <span class="o">=</span> <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Render a DOM from HTML</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>html must be a String.</strong><br/>(HTML to render)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(the rendered DOM)</p></div></div><div class="code"><div class="wrapper"><span class="nx">dom</span><span class="p">.</span><span class="nx">render</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">html</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">jsdom</span><span class="p">(</span><span class="nx">html</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">features</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">FetchExternalResources</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="nx">ProcessExternalResources</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Clean up an element by stripping out chains of whitespace
+and newlines.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>str must be a String.</strong><br/>(element text)</li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(the cleaned string)</p></div></div><div class="code"><div class="wrapper"><span class="nx">dom</span><span class="p">.</span><span class="nx">cleanElement</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s{2,}/mg</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">trim</span><span class="p">();</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Extract a specified attribute from a node</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>node must be a Node.</strong><br/>(the DOM node)</p></li>
+<li><p><strong>attribute must be a String.</strong><br/>(the name of the attribute to extract)</p></li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(the attribute value)</p></div></div><div class="code"><div class="wrapper"><span class="nx">dom</span><span class="p">.</span><span class="nx">getAttribute</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">node</span><span class="p">,</span> <span class="nx">attribute</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">attribute</span> <span class="o">||</span> <span class="nx">attribute</span> <span class="o">==</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">attribute</span> <span class="o">==</span> <span class="s1">&#39;html&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">innerHTML</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="nx">attribute</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Select a DOM node matching an XPath selector</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>selector must be a String.</strong><br/>(an XPath selector)</p></li>
+<li><p><strong>doc must be an Object.</strong><br/>(the DOM to search)</p></li>
+</ul>
+
+<p><strong>Returns a Node</strong><br/>(the selected node)</p></div></div><div class="code"><div class="wrapper"><span class="nx">dom</span><span class="p">.</span><span class="nx">select</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span> <span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">xpath</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span> <span class="nx">doc</span><span class="p">);</span>
+<span class="p">}</span></div></div></div></div></body></html>

@@ -1,0 +1,15 @@
+{
+  "url": "\\w+",
+  "name": "followOn example",
+  "elements" : {
+    "inputName": {
+      "follow": "xmlns",
+      "selector": "//input",
+      "attribute": "name"
+    },
+    "xmlns": {
+      "selector": "//html",
+      "attribute": "xmlns"
+    }
+  }
+}

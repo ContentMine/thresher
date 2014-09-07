@@ -1,0 +1,193 @@
+<!DOCTYPE html><html lang="en"><head><title>scraper</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="scraper"><meta name="groc-project-path" content="lib/scraper.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/scraper.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="scraperjs">Scraper.js</h1>
+
+<blockquote>
+  <p>Scraper class in the Node.js Thresher package.</p>
+  
+  <p>author: <a href="http://blahah/net">Richard Smith-Unna</a>
+  email: <a href="&#109;&#97;&#x69;&#x6c;t&#x6f;:&#x72;i&#99;&#x68;&#x61;&#x72;&#100;&#64;c&#111;&#110;t&#101;&#110;&#x74;&#x6d;&#x69;&#x6e;&#101;&#46;&#x6f;&#114;&#x67;">&#x72;i&#99;&#x68;&#x61;&#x72;&#100;&#64;c&#111;&#110;t&#101;&#110;&#x74;&#x6d;&#x69;&#x6e;&#101;&#46;&#x6f;&#114;&#x67;</a>
+  copyright: "Shuttleworth Foundation 2014"</p>
+</blockquote>
+
+<h2 id="licensemithttpsgithubcomcontentminethresherblobmasterlicensemit">> license: <a href="https://github.com/ContentMine/thresher/blob/master/LICENSE-MIT">MIT</a></h2>
+
+<h2 id="description">Description</h2>
+
+<p>Scrapers can scrape DOMs. They are created from ScraperJSON definitions,
+and return scraped data as structured JSON.
+Scrapers emit the following events:
+* <code>error</code>: on any error. If not intercepted, these events will throw.
+* <code>elementCaptured</code> <strong><em>(data)</em></strong>: when an element is successfully captured.
+* <code>elementCaptureFailed</code> <strong><em>(element)</em></strong>: when element capture fails.
+* <code>downloadComplete</code>
+* <code>downloadError</code></p>
+
+<h2 id="usage">Usage</h2>
+
+<p>The Scraper class is created from a ScraperJSON definition:
+    var scraper = new Scraper(definition);
+The scraper is them executed on DOMs:
+    scraper.scrapeDoc(doc);</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./file.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">Downloader</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./download.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./url.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">dom</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./dom.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./ticker.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">Scraper</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scraper</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">validate</span><span class="p">(</span><span class="nx">scraper</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">url</span> <span class="o">=</span> <span class="nx">scraper</span><span class="p">.</span><span class="nx">url</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">doi</span> <span class="o">=</span> <span class="nx">scraper</span><span class="p">.</span><span class="nx">doi</span> <span class="o">||</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">scraper</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">elements</span> <span class="o">=</span> <span class="nx">scraper</span><span class="p">.</span><span class="nx">elements</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">followOns</span> <span class="o">=</span> <span class="nx">scraper</span><span class="p">.</span><span class="nx">followOns</span> <span class="o">||</span> <span class="p">[];</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Scraper inherits from EventEmitter</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>validate a scraperJSON definition</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">validate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">def</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">problems</span> <span class="o">=</span> <span class="p">[];</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>url key must exist</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">def</span><span class="p">.</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">problems</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;must have &quot;url&quot; key&#39;</span><span class="p">);</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>elements key must exist</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">def</span><span class="p">.</span><span class="nx">elements</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">problems</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;must have &quot;elements&quot; key&#39;</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>there must be at least 1 element</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">def</span><span class="p">.</span><span class="nx">elements</span><span class="p">).</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">problems</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no elements were defined&#39;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>each element much have a selector</p></div></div><div class="code"><div class="wrapper">      <span class="kd">var</span> <span class="nx">elements</span> <span class="o">=</span> <span class="nx">def</span><span class="p">.</span><span class="nx">elements</span><span class="p">;</span>
+      <span class="k">for</span> <span class="p">(</span><span class="nx">k</span> <span class="k">in</span> <span class="nx">elements</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="nx">elements</span><span class="p">[</span><span class="nx">k</span><span class="p">];</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">e</span><span class="p">.</span><span class="nx">selector</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">problems</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;element &#39;</span> <span class="o">+</span> <span class="nx">k</span> <span class="o">+</span> <span class="s1">&#39; has no selector&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">problems</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;invalid ScraperJSON definition: \n&#39;</span> <span class="o">+</span>
+                       <span class="nx">problems</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">)));</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>check if this scraper applies to a given URL</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">matchesURL</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">regex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">regex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Annotate any elements that are depended on
+as follow-ons by other elements by setting
+their 'followme' property to true</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">annotateFollows</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">follows</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="nx">elementsArray</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">element</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">elementsArray</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">element</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s1">&#39;follow&#39;</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">follows</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">element</span><span class="p">.</span><span class="nx">follow</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="nx">elementsArray</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">element</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">elementsArray</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">follows</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">element</span><span class="p">.</span><span class="nx">key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">element</span><span class="p">.</span><span class="nx">followme</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO: maybe a better approach is to have a function
+that handles an object, checking if it's an element,
+and recursing if it has child elements</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Load elements from a dictionary of nested objects
+to a dictionary of nested scrapers, also
+storing all elements in a flat array for rapid iteration</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">loadElements</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">elementsArray</span> <span class="o">=</span> <span class="nx">getChildElements</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">getChildElements</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">elementsArray</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">elements</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">elements</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">element</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">elements</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+      <span class="nx">element</span><span class="p">.</span><span class="nx">key</span> <span class="o">=</span> <span class="nx">key</span><span class="p">;</span>
+      <span class="nx">elementsArray</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">element</span><span class="p">);</span>
+      <span class="nx">elementsArray</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">getChildElements</span><span class="p">(</span><span class="nx">element</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">elementsArray</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Scrape the provided doc with this scraper
+and return the results object</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">scrapeDoc</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">doc</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">results</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">scrape</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">doc</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">results</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">scrape</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nx">setMaxListeners</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">startTicker</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">results</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="nx">elements</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">element</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">elements</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">scrapeElement</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">key</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">results</span>
+<span class="p">}</span>
+
+<span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">startTicker</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">ticker</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">ticker</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Ticker</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Scrape a specific element</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">scrapeElement</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">scraper</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>extract element</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">selector</span> <span class="o">=</span> <span class="nx">element</span><span class="p">.</span><span class="nx">selector</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">attribute</span> <span class="o">=</span> <span class="nx">element</span><span class="p">.</span><span class="nx">attribute</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nx">dom</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">doc</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">matches</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">matches</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">res</span> <span class="o">=</span> <span class="nx">dom</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="nx">attribute</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>run regex if applicable</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">element</span><span class="p">.</span><span class="nx">regex</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span> <span class="o">=</span> <span class="nx">scraper</span><span class="p">.</span><span class="nx">runRegex</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="nx">element</span><span class="p">.</span><span class="nx">regex</span><span class="p">)</span>
+      <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>save the result</p></div></div><div class="code"><div class="wrapper">      <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{};</span>
+      <span class="nx">data</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">res</span><span class="p">;</span>
+      <span class="nx">scraper</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;elementCaptured&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>process downloads</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">element</span><span class="p">.</span><span class="nx">download</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">scraper</span><span class="p">.</span><span class="nx">downloadElement</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">scrapeUrl</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">scraper</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;elementCaptureFailed&#39;</span><span class="p">,</span> <span class="nx">element</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Download the resource specified by an element</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">downloadElement</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">scrapeUrl</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">down</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">down</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Downloader</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">scraper</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>rename downloaded file?</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">rename</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">element</span><span class="p">.</span><span class="nx">download</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">element</span><span class="p">.</span><span class="nx">download</span><span class="p">.</span><span class="nx">rename</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">rename</span> <span class="o">=</span> <span class="nx">element</span><span class="p">.</span><span class="nx">download</span><span class="p">.</span><span class="nx">rename</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>set download running</p></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">down</span><span class="p">.</span><span class="nx">downloadResource</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="nx">scrapeUrl</span><span class="p">,</span> <span class="nx">rename</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>add it to the task ticker</p></div></div><div class="code"><div class="wrapper">  <span class="nx">scraper</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nx">elongate</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">down</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;downloadComplete&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">scraper</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;downloadCompleted&#39;</span><span class="p">,</span> <span class="nx">res</span><span class="p">);</span>
+    <span class="nx">scraper</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nx">tick</span><span class="p">();</span>
+  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">down</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">scraper</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;downloadError&#39;</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
+    <span class="nx">scraper</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nx">tick</span><span class="p">();</span>
+  <span class="p">});</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Run regular expression on a captured element</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">runRegex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">string</span><span class="p">,</span> <span class="nx">regex</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">re</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">regex</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">re</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">string</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">matches</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">while</span> <span class="p">(</span><span class="nx">match</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">captures</span> <span class="o">=</span> <span class="nx">match</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">re</span><span class="p">.</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">matches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">captures</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">matches</span> <span class="o">=</span> <span class="nx">captures</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">match</span> <span class="o">=</span> <span class="nx">re</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">string</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">matches</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a new Scraper with this url and the elements provided
+return the new scraper</p></div></div><div class="code"><div class="wrapper"><span class="nx">Scraper</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">makeSubScraper</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elements</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">sub</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scraper</span><span class="p">({</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+    <span class="nx">elements</span><span class="o">:</span> <span class="nx">elements</span>
+  <span class="p">});</span>
+  <span class="k">return</span> <span class="nx">sub</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Scraper</span><span class="p">;</span></div></div></div></div></body></html>

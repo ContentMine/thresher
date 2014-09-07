@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"><head><title>url</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="url"><meta name="groc-project-path" content="lib/url.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/url.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Check a URL meets basic validity requirements.
+Return true if the URL is of the form:
+http://domain.tld[/other/parts]
+OR
+https://...
+ftp://...
+Otherwise, raise an Error.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>theUrl must be a String.</strong><br/>(the URL to validate)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">url</span><span class="p">.</span><span class="nx">checkUrl</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">theUrl</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s1">&#39;function checkUrl: &#39;</span> <span class="o">+</span> <span class="nx">theUrl</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">protocol</span> <span class="o">=</span> <span class="sr">/^(f|ht)tps?:\/\//i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">theUrl</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">domain</span> <span class="o">=</span> <span class="sr">/:\/\/\w+(\.\w+)*([:\/].+)*$/i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">theUrl</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">protocol</span> <span class="o">||</span> <span class="o">!</span><span class="nx">domain</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>not a valid URL</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="s1">&#39;malformed URL: &#39;</span> <span class="o">+</span> <span class="nx">theUrl</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">protocol</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">msg</span> <span class="o">+=</span> <span class="s1">&#39;protocol missing (must include http(s):// or ftp(s)://)&#39;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">domain</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">protocol</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">msg</span> <span class="o">+=</span> <span class="s1">&#39;, &#39;</span>
+      <span class="p">}</span>
+      <span class="nx">msg</span> <span class="o">+=</span> <span class="s1">&#39;domain missing&#39;</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+    <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Convert a file:/// url to an absolute remote URL.
+Rendering pages locally sometimes adds a spurious
+'file:///' to the beginning of relative resource paths.
+This function strips the 'file:///' and constructs an
+absolute url.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>path must be a String.</strong><br/>(resource path to clean)</p></li>
+<li><p><strong>pageUrl must be a String.</strong><br/>(URL of the page the resource was linked from)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">url</span><span class="p">.</span><span class="nx">cleanResourcePath</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">pageUrl</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="sr">/^(f|ht)tps?:\/\//i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">path</span><span class="p">))</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>already absolute</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="nx">path</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="sr">/^file:\/\/\/?/i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="o">||</span>
+            <span class="p">(</span><span class="sr">/^\//</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">path</span><span class="p">)))</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>root relative path</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">relative</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^(file:)?\/+/gi</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">root</span> <span class="o">=</span> <span class="nx">url</span><span class="p">.</span><span class="nx">getRoot</span><span class="p">(</span><span class="nx">pageUrl</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nx">root</span><span class="p">,</span> <span class="nx">relative</span><span class="p">].</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">url</span><span class="p">.</span><span class="nx">relativeToAbsolute</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">pageUrl</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Get the base URL from a URL</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>fullUrl must be a String.</strong><br/>(the URL)</li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(the base URL)</p></div></div><div class="code"><div class="wrapper"><span class="nx">url</span><span class="p">.</span><span class="nx">getBase</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">fullUrl</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">splitUrl</span> <span class="o">=</span> <span class="nx">fullUrl</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;://&#39;</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">splitUrl</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="nx">splitUrl</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">).</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>naked domain - return unchanged</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="nx">fullUrl</span>
+  <span class="p">}</span>
+  <span class="nx">splitUrl</span> <span class="o">=</span> <span class="nx">fullUrl</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">splitUrl</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">splitUrl</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Get the root URL from a URL</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>fullUrl must be a String.</strong><br/>(the URL)</li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(the root URL)</p></div></div><div class="code"><div class="wrapper"><span class="nx">url</span><span class="p">.</span><span class="nx">getRoot</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">fullUrl</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">splitUrl</span> <span class="o">=</span> <span class="nx">fullUrl</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">splitUrl</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Convert a relative URL to an absolute</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>relative must be a String.</strong><br/>(the relative URL to convert)</p></li>
+<li><p><strong>current must be a String.</strong><br/>(the URL to which <code>relative</code> is relative)</p></li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(the converted URL)</p></div></div><div class="code"><div class="wrapper"><span class="nx">url</span><span class="p">.</span><span class="nx">relativeToAbsolute</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">relative</span><span class="p">,</span> <span class="nx">current</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">[</span><span class="nx">url</span><span class="p">.</span><span class="nx">getBase</span><span class="p">(</span><span class="nx">current</span><span class="p">),</span> <span class="nx">relative</span><span class="p">].</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resolve HTTP redirects</p></div></div><div class="code"><div class="wrapper"><span class="nx">url</span><span class="p">.</span><span class="nx">resolveRedirects</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">request</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;HEAD&#39;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">){</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">href</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span></div></div></div></div></body></html>

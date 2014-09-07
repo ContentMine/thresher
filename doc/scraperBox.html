@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="en"><head><title>scraperBox</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="scraperBox"><meta name="groc-project-path" content="lib/scraperBox.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/scraperBox.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">),</span>
+    <span class="nx">Scraper</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./scraper.js&#39;</span><span class="p">),</span>
+    <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Create a new ScraperSet.
+A ScraperBox is a container for scraperJSON
+scrapers.
+ScraperBox handles loading a directory of scrapers
+and selecting the matching scraper for a given URL</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>dir must be a String.</strong><br/>(directory containing scraperJSON definitions)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">ScraperBox</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">dir</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">scrapers</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">dir</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">files</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">dir</span><span class="p">);</span>
+    <span class="nx">files</span> <span class="o">=</span> <span class="nx">files</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;\.json$&#39;</span><span class="p">).</span><span class="nx">test</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+    <span class="p">});</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">files</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">files</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+      <span class="nx">file</span> <span class="o">=</span> <span class="nx">dir</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nx">file</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">addScraper</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">scrapers</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scrapersLoaded&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">scrapers</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>ScraperBox inherits from EventEmitter</p></div></div><div class="code"><div class="wrapper"><span class="nx">ScraperBox</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Add a scraper definition from a scraperJSON file</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>scraper can be an Object or a String.</strong><br/>(scraper definition object OR path to the scraperJSON file)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">ScraperBox</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addScraper</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">def</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">def</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">def</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">def</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">scraper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scraper</span><span class="p">(</span><span class="nx">def</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scraper</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">scrapers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">scraper</span><span class="p">);</span>
+      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;could not load scraper: &#39;</span> <span class="o">+</span> <span class="nx">def</span>
+              <span class="o">+</span> <span class="s1">&#39;, because: &#39;</span> <span class="o">+</span> <span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Get the scraper whose <code>url</code> field matches the provided URL
+and return it.
+If no matching scrapers are found, return null.
+If multiple matching scrapers are found, return
+the one with the most specific match.
+If multiple scrapers are found with equally specific
+matches, return the one that was added to the ScraperSet
+first.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>url must be a String.</strong><br/>(the URL)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">ScraperBox</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getScraper</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;gettingScraper&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">matches</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="nx">scrapers</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">scraper</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">scrapers</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scraper</span><span class="p">.</span><span class="nx">matchesURL</span><span class="p">(</span><span class="nx">url</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">matches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">scraper</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">matches</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scraperNotFound&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">matches</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scraperFound&#39;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+  <span class="p">}</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scraperFound&#39;</span><span class="p">);</span>
+  <span class="nx">matches</span> <span class="o">=</span> <span class="nx">matches</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="nx">compareRegexSpecificity</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Compare two definitions a and b to decide which has the more
+specific regex. Specificity is defined as the number of non-
+wildcard characters in the regex.
+If a is more specific return 1
+If b is more specific return -1
+If a and b have equal specificity return 0</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">compareRegexSpecificity</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">aSpec</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">url</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/[a-z0-9]/gi</span><span class="p">)</span><span class="o">||</span><span class="p">[]).</span><span class="nx">length</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">bSpec</span> <span class="o">=</span> <span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">url</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/[a-z0-9]/gi</span><span class="p">)</span><span class="o">||</span><span class="p">[]).</span><span class="nx">length</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">aSpec</span> <span class="o">&gt;</span> <span class="nx">bSpec</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">aSpec</span> <span class="o">&lt;</span> <span class="nx">bSpec</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">ScraperBox</span><span class="p">;</span></div></div></div></div></body></html>

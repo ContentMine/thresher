@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="en"><head><title>thresher</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="thresher"><meta name="groc-project-path" content="lib/thresher.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/thresher.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;shelljs/global&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">deps</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./dependencies.js&#39;</span><span class="p">),</span>
+    <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>SpookyJS provides our bridge to CasperJS and PhantomJS</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">Spooky</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;spooky&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./file.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">Downloader</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./download.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./url.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">dom</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./dom.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./ticker.js&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a new Thresher.
+A Thresher controlls a scraping operation.
+Thresher handles rendering a page using the chosen rendering engine,
+passing the HTML of the rendered page back to the Node context,
+re-rendering it in the local Node jsdom, and
+running scraperJSON-defined scrapers on the rendered DOM.
+Thresher emits events during the scraping process:
+- 'error': if an error occurs
+- 'element': for each extracted element
+- 'result': the final result of a single scraping operation
+- 'rendered': when the HTML of the rendered DOM is returned from PhantomJS</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">Thresher</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Thresher inherits from EventEmitter</p></div></div><div class="code"><div class="wrapper"><span class="nx">Thresher</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Bubble SpookyJS errors up to our interface,
+providing a clear context message and the SpookyJS message
+as detail.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>err must be a String.</strong><br/>(the SpookyJS error.)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">handleInitError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Failed to initialize SpookyJS&#39;</span><span class="p">);</span>
+    <span class="nx">e</span><span class="p">.</span><span class="nx">details</span> <span class="o">=</span> <span class="nx">err</span><span class="p">;</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span>
+    <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>generate SpookyJS settings</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>loglevel must be a String.</strong><br/>(the loglevel)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(the settings)</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">settings</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">loglevel</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">env</span><span class="p">[</span><span class="s1">&#39;PHANTOMJS_EXECUTABLE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">deps</span><span class="p">.</span><span class="nx">getbinpath</span><span class="p">(</span><span class="s1">&#39;phantomjs&#39;</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">child</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">command</span><span class="o">:</span> <span class="nx">deps</span><span class="p">.</span><span class="nx">getbinpath</span><span class="p">(</span><span class="s1">&#39;casperjs&#39;</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="nx">casper</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">logLevel</span><span class="o">:</span> <span class="nx">loglevel</span><span class="p">,</span>
+      <span class="nx">verbose</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nx">exitOnError</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nx">httpStatusHandlers</span><span class="o">:</span> <span class="p">{</span>
+        <span class="mi">404</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">resource</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="nx">resource</span><span class="p">.</span><span class="nx">status</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="nx">resource</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+          <span class="nx">casper</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nx">pageSettings</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">loadImages</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nx">loadPlugins</span><span class="o">:</span> <span class="kc">false</span>
+      <span class="p">},</span>
+      <span class="nx">resourceTimeout</span><span class="o">:</span> <span class="mi">20000</span><span class="p">,</span>
+      <span class="nx">onResourceTimeout</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;resourceTimeout&#39;</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">errorCode</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">errorString</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+        <span class="nx">casper</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="nx">onLoadError</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">msg</span><span class="p">,</span> <span class="nx">trace</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">space</span><span class="o">:</span> <span class="s1">&#39;remote&#39;</span><span class="p">,</span> <span class="nx">message</span><span class="o">:</span> <span class="nx">msg</span> <span class="o">+</span> <span class="nx">trace</span> <span class="p">});</span>
+        <span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;loadError&#39;</span><span class="p">,</span> <span class="nx">msg</span><span class="p">,</span> <span class="nx">trace</span><span class="p">);</span>
+        <span class="nx">casper</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Scrape a URL using a ScraperJSON-defined scraper.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>scrapeUrl must be a String.</strong><br/>(the URL to scrape)</p></li>
+<li><p><strong>definition must be an Object.</strong><br/>(a dictionary defining the scraper)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Thresher</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">scrape</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scrapeUrl</span><span class="p">,</span> <span class="nx">definition</span><span class="p">,</span> <span class="nx">headless</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s1">&#39;function scrape: &#39;</span> <span class="o">+</span> <span class="nx">scrapeUrl</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">loglevel</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span><span class="p">;</span> <span class="c1">// delete this and move away from logging to events</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>validate arguments</p></div></div><div class="code"><div class="wrapper">  <span class="nx">url</span><span class="p">.</span><span class="nx">checkUrl</span><span class="p">(</span><span class="nx">scrapeUrl</span><span class="p">);</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scrapeStart&#39;</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">thresher</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">headless</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>let's get our scrape on</p></div></div><div class="code"><div class="wrapper">    <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s1">&#39;creating spooky instance&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">spooky</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spooky</span><span class="p">(</span><span class="nx">settings</span><span class="p">(</span><span class="nx">loglevel</span><span class="p">),</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s1">&#39;spooky initialising&#39;</span><span class="p">);</span>
+      <span class="nx">spooky</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">scrapeUrl</span><span class="p">);</span>
+
+      <span class="nx">spooky</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>in SpookyJS scope</p></div></div><div class="code"><div class="wrapper">        <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;pageDownload&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">evaluate</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>in rendered page scope</p></div></div><div class="code"><div class="wrapper">          <span class="k">return</span> <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">outerHTML</span><span class="p">;</span>
+        <span class="p">}));</span>
+      <span class="p">});</span>
+
+      <span class="nx">spooky</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
+    <span class="p">});</span>
+
+    <span class="nx">spooky</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;pageDownload&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">html</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">thresher</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;pageRendered&#39;</span><span class="p">,</span> <span class="nx">html</span><span class="p">);</span>
+      <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s1">&#39;page downloaded and rendered&#39;</span><span class="p">);</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">thresher</span><span class="p">.</span><span class="nx">scrapeHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">,</span> <span class="nx">definition</span><span class="p">,</span> <span class="nx">scrapeUrl</span><span class="p">);</span>
+        <span class="nx">thresher</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scrapeResults&#39;</span><span class="p">,</span> <span class="nx">results</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;problem scraping html:&#39;</span><span class="p">);</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="nx">spooky</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;404&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">,</span> <span class="nx">trace</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">err</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+      <span class="nx">err</span><span class="p">.</span><span class="nx">stack</span> <span class="o">=</span> <span class="nx">trace</span><span class="p">;</span>
+      <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="nx">spooky</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;resourceTimeout&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">code</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">err</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">code</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nx">string</span> <span class="o">+</span> <span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="nx">url</span><span class="p">);</span>
+      <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">loglevel</span> <span class="o">===</span> <span class="s1">&#39;debug&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">spooky</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;console&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">line</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">parts</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="nx">parts</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">parts</span><span class="p">.</span><span class="nx">length</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">));</span>
+      <span class="p">});</span>
+
+      <span class="nx">spooky</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">log</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">log</span><span class="p">.</span><span class="nx">space</span> <span class="o">===</span> <span class="s1">&#39;remote&#39;</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">log</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/ \- .*/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">));</span>
+        <span class="p">}</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">conf</span> <span class="o">=</span> <span class="p">{</span><span class="nx">url</span><span class="o">:</span> <span class="nx">scrapeUrl</span><span class="p">};</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">jar</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">conf</span><span class="p">.</span><span class="nx">jar</span> <span class="o">=</span> <span class="nx">jar</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">request</span><span class="p">(</span><span class="nx">conf</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">error</span> <span class="o">&amp;&amp;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">thresher</span><span class="p">.</span><span class="nx">scrapeHtml</span><span class="p">(</span><span class="nx">body</span><span class="p">,</span>
+                                          <span class="nx">definition</span><span class="p">,</span>
+                                          <span class="nx">scrapeUrl</span><span class="p">);</span>
+        <span class="nx">thresher</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;scrapeResults&#39;</span><span class="p">,</span> <span class="nx">results</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">Thresher</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">loadCookie</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">filepath</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">cookiejson</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">filepath</span><span class="p">));</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">jar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CookieJar</span><span class="p">();</span>
+  <span class="nx">jar</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">cookiejson</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Thresher</span><span class="p">;</span></div></div></div></div></body></html>

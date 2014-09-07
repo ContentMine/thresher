@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><title>file</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="file"><meta name="groc-project-path" content="lib/file.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/file.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Handle errors in file writing</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>err must be an Error.</strong><br/>(a file error)</p></li>
+<li><p><strong>filename must be a String.</strong><br/>(the filename that was being written)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">handleFileError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">filename</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Failed writing to file: &#39;</span> <span class="o">+</span> <span class="nx">filename</span><span class="p">);</span>
+    <span class="nx">e</span><span class="p">.</span><span class="nx">details</span> <span class="o">=</span> <span class="nx">err</span><span class="p">;</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p>Synchronously write a string to file</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>filename must be a String.</strong><br/>(the filename to write to)</p></li>
+<li><p><strong>str must be a String.</strong><br/>(the string to write)</p></li>
+<li><p><strong>cb must be a Function.</strong><br/>(callback to run on completion)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">file</span><span class="p">.</span><span class="nx">write</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">str</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s1">&#39;writing file: &#39;</span> <span class="o">+</span> <span class="nx">filename</span><span class="p">);</span>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">str</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">filename</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">handleFileError</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+    <span class="nx">cb</span><span class="p">();</span>
+  <span class="p">});</span>
+<span class="p">}</span></div></div></div></div></body></html>

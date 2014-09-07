@@ -20,43 +20,20 @@ describe("Thresher", function() {
 
   describe(".scrape()", function() {
 
-    it("should extract simple XPaths", function(done) {
+    it("should control a scrape", function(done) {
       var url = 'http://localhost:' + mockport + '/data/tiny.html';
       var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
-      var def = ss.getScraper(url);
-      var thresher = new Thresher();
-      thresher.scrape(url, def.elements, false);
-      thresher.on('elementCaptured', function(data) {
-        data.xmlns.should.be.exactly("/data/tiny2.html");
-        done();
-      });
-    });
+      var thresher = new Thresher(ss);
 
-    it("should extract regexes", function(done) {
-      var url = 'http://localhost:' + mockport + '/data/regex.html';
-      var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
-      var def = ss.getScraper(url);
-      var thresher = new Thresher();
-      thresher.scrape(url, def.elements, false);
-      thresher.on('elementCaptured', function(data) {
-        data.answer[0].should.be.exactly("regex");
-        data.answer[1].should.be.exactly("success");
+      thresher.on('result', function(result) {
+        result.should.have.property('xmlns');
+        result.xmlns.should.have.property('value').with.lengthOf(1);
+        result.xmlns.value[0].should.be.exactly("/data/tiny2.html");
         done();
       });
-    });
 
-    it("should download resources", function(done) {
-      var url = 'http://localhost:' + mockport + '/data/tiny.html';
-      var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
-      var def = ss.getScraper(url);
-      def.elements.xmlns.download = { rename: 'schema.xml' };
-      var thresher = new Thresher();
-      thresher.scrape(url, def.elements, false);
-      thresher.on('downloadCompleted', function(res) {
-        fs.existsSync('schema.xml').should.be.ok;
-        done();
-      });
-      thresher.on('downloadStarted', function(){ console.log('started'); });
+      thresher.scrape(url, false);
+
     });
 
   });

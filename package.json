@@ -44,12 +44,12 @@
     "xpath": "0.0.6"
   },
   "devDependencies": {
-    "coveralls": "~2.10.0",
+    "coveralls": "~2.11.1",
     "mocha-lcov-reporter": "0.0.1",
     "should": "~4.0.0",
-    "istanbul": "~0.2.10",
-    "mocha": "~1.20.0",
-    "express": "~4.6.1",
+    "istanbul": "~0.3.2",
+    "mocha": "~1.21.4",
+    "express": "~4.8.8",
     "temp": "~0.8.0"
   },
   "keywords": [

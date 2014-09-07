@@ -37,7 +37,6 @@
     "jsdom-little": "~0.10.5",
     "lodash": "^2.4.1",
     "phantomjs": "~1.9.7-12",
-    "request": "~2.37.0",
     "set": "^1.1.1",
     "shelljs": "~0.3.0",
     "spooky": "~0.2.4",

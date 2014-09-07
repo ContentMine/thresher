@@ -8,7 +8,7 @@ describe("ScraperBox", function() {
     it("should init with a dir of scraperJSON files", function() {
       var s = new ScraperBox(__dirname + '/data/scrapers');
       s.should.be.an.instanceOf(ScraperBox);
-      s.scrapers.should.have.lengthOf(3);
+      s.scrapers.should.have.lengthOf(5);
     });
 
     it("should init with no dir", function() {
@@ -35,8 +35,9 @@ describe("ScraperBox", function() {
         }
       };
       var sb = new ScraperBox();
-      sb.on('error', function() {} );
-      sb.addScraper(s).should.not.be.ok;
+      (function() {
+        sb.addScraper(s);
+      }).should.throw(/invalid ScraperJSON definition/);
     });
 
   });

@@ -197,7 +197,7 @@ describe("Scraper", function() {
         var scraper = new Scraper(def);
         var theUrl = 'http://localhost:' + mockport + '/data/tiny.html';
 
-        scraper.on('downloadCompleted', function() {
+        scraper.on('downloadSaved', function() {
           fs.existsSync('tiny2.html').should.be.ok;
           done();
         });

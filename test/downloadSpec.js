@@ -30,7 +30,7 @@ describe("download", function() {
         var rename = null;
         var down = new Downloader();
         down.downloadResource(resUrl, scrapeUrl, rename, null);
-        down.on('downloadComplete', function() {
+        down.on('downloadSaved', function() {
           fs.existsSync('tiny.html').should.be.ok;
           done();
         });
@@ -53,7 +53,7 @@ describe("download", function() {
         var rename = null;
         var down = new Downloader();
         down.downloadResource(resUrl, scrapeUrl, rename, null);
-        down.on('downloadComplete', function() {
+        down.on('downloadSaved', function() {
           fs.existsSync('tiny2.html').should.be.ok;
           fs.unlink('tiny2.html', function (err) {
             if (err) throw err;
@@ -79,7 +79,7 @@ describe("download", function() {
         var rename = 'blimey.html';
         var down = new Downloader();
         down.downloadResource(resUrl, scrapeUrl, rename, null);
-        down.on('downloadComplete', function() {
+        down.on('downloadSaved', function() {
           fs.existsSync('blimey.html').should.be.ok;
           done();
         });

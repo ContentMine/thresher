@@ -33,7 +33,7 @@ npm install --save thresher
 
 ## Usage
 
-See [quickscrape](https://github.com/ContentMine/quickscrape) for a thorough exmaple of thresher in action.
+See [quickscrape](https://github.com/ContentMine/quickscrape) for a thorough example of thresher in action.
 
 ## Contributing
 
@@ -50,6 +50,7 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 - ***0.0.7*** - support scraperJSON v0.0.2: add regex capability, remove all logging, move to event-based design
 - ***0.0.8*** - resolve URLs with head-follow requests; refactor to have a Scraper class; supply cookies to downloader; use jsdom-lite to forestall some of the worst installation issues (thanks to @darobin).
 - ***0.0.9*** - fix broken release
+- ***0.1.0*** - complete rewrite to support scraperJSON v0.1
 
 ## License
 Copyright (c) 2014 [Shuttleworth Foundation](https://www.shuttleworthfoundation.org/).

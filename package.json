@@ -1,7 +1,7 @@
 {
   "name": "thresher",
   "description": "Headless ScraperJSON scraping for Node.js",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "homepage": "https://github.com/ContentMine/quickscrape",
   "author": {
     "name": "Richard Smith-Unna",

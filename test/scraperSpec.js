@@ -23,14 +23,26 @@ describe("Scraper", function() {
   describe("()", function() {
 
     it("should reject a malformed definition", function() {
-      var defs = [{ elements: {} },
-                  { url: '.*' },
-                  { url: '.*',
-                    elements: {}
-                  },
-                  { url: "\\.*",
-                    elements: { 'fulltext': {} }
-                  }];
+      var defs = [
+        { elements: {} }, // empty elements, no url
+        { url: '.*' }, // no elements
+        { // empty elements
+          url: '.*',
+          elements: {}
+        },
+        { // element specified doesn't have selector
+          url: "\\.*",
+          elements: { 'fulltext': {} }
+        },
+        { // nested elements doesn't have selector
+          url: "\\.*",
+          elements: {
+            section: {
+              abstract: {}
+            }
+          }
+        }
+      ];
       for (var i in defs) {
         var def = defs[i];
         (function() {
@@ -40,14 +52,26 @@ describe("Scraper", function() {
     });
 
     it("should accept a well formed definition", function() {
-      var defs = [{
-        url: "\\.*",
-        elements: {
-          'fulltext': {
-            'selector': '//div'
+      var defs = [
+        { // normal single-level element
+          url: "\\.*",
+          elements: {
+            fulltext: {
+              selector: '//div'
+            }
+          }
+        },
+        { // nested element
+          url: "\\.*",
+          elements: {
+            section: {
+              abstract: {
+                selector: '//div'
+              }
+            }
           }
         }
-      }];
+      ];
       for (var i in defs) {
         var def = defs[i];
         (new Scraper(def)).should.be.ok;
@@ -98,16 +122,21 @@ describe("Scraper", function() {
         url: "\\.+",
         elements: {
           one: {
-            selector: "/a",
+            selector: "/a"
           },
           two: {
-            selector: "/h1",
+            selector: "/h1"
+          },
+          box: {
+            three: {
+              selector: "/div"
+            }
           }
         }
       }
       var scraper = new Scraper(def);
       scraper.loadElements();
-      scraper.elementsArray.length.should.be.exactly(2);
+      scraper.elementsArray.length.should.be.exactly(3);
     });
 
   });
@@ -122,7 +151,6 @@ describe("Scraper", function() {
                                           '/data/scrapers/follow.json',
                                           'utf8'));
       var scraper = new Scraper(def);
-
       scraper.on('end', function(results, structured) {
         structured.should.have.property('inputName');
         structured.inputName.should.have.property('value');

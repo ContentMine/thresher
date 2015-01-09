@@ -5,7 +5,10 @@
     "answer": {
       "selector": "//h1",
       "attribute": "text",
-      "regex": "(\\w+)\\s(\\w+)"
+      "regex": "(\\w+)\\s(\\w+)",
+      "subthing": {
+        "selector": "//div"
+      }
     }
   }
 }

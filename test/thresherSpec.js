@@ -25,7 +25,7 @@ describe("Thresher", function() {
       var ss = new ScraperBox(path.join(__dirname, 'data', 'scrapers'));
       var thresher = new Thresher(ss);
 
-      thresher.on('result', function(result) {
+      thresher.on('result', function(ignored, result) {
         result.should.have.property('xmlns');
         result.xmlns.should.have.property('value').with.lengthOf(1);
         result.xmlns.value[0].should.be.exactly("/data/tiny2.html");

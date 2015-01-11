@@ -3,12 +3,9 @@
   "name": "test3",
   "elements": {
     "answer": {
-      "selector": "//h1",
+      "selector": "//li",
       "attribute": "text",
-      "regex": "(\\w+)\\s(\\w+)",
-      "subthing": {
-        "selector": "//div"
-      }
+      "regex": "Published: (.+)"
     }
   }
 }

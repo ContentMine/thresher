@@ -240,19 +240,32 @@ describe("Scraper", function() {
 
     it("should return an array of matches", function(done) {
       var def = JSON.parse(fs.readFileSync(__dirname +
-                                          '/data/scrapers/test3.json',
-                                          'utf8'));
+        '/data/scrapers/test3.json',
+        'utf8'));
+      var scraper = new Scraper(def);
+      var regex = "Published:\\s(.+)";
+      var text = "Published: October 03, 2011"
+      var res = scraper.runRegex(text, regex);
+      res.should.be.an.instanceOf(Array);
+      res.should.have.lengthOf(1);
+      res[0].should.equal('October 03, 2011');
+      done();
+    });
+
+    it("should work when run through a scraper", function(done) {
+      var def = JSON.parse(fs.readFileSync(__dirname +
+        '/data/scrapers/test3.json',
+        'utf8'));
       var scraper = new Scraper(def);
       var htmPath = __dirname + '/data/regex.html';
       var doc = dom.render(fs.readFileSync(htmPath, 'utf8'));
 
       scraper.on('elementCaptured', function(key, result) {
         key.should.equal('answer');
-        result[0].should.equal('regex');
-        result[1].should.equal('success');
+        result[0].should.equal('October 03, 2011');
         done();
       });
-
+      
       scraper.scrapeElement(doc, scraper.elementsArray[0]);
     });
 

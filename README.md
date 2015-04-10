@@ -53,6 +53,7 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 - ***0.1.0*** - complete rewrite to support scraperJSON v0.1
 - ***0.1.1*** - fixes for regexes, definition checking, cleanup logging
 - ***0.1.2*** - fix bug in resolving relative paths, update dependencies, bring xpath dependency into local control to avoid a namespace-related regression in the main fork, and fix follow-ons.
+- ***0.1.3*** - fix broken release where a dependency was left out of package.json.
 
 ## License
 Copyright (c) 2014 [Shuttleworth Foundation](https://www.shuttleworthfoundation.org/).

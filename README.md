@@ -51,6 +51,8 @@ We are not yet accepting contributions, if you'd like to help please drop me an 
 - ***0.0.8*** - resolve URLs with head-follow requests; refactor to have a Scraper class; supply cookies to downloader; use jsdom-lite to forestall some of the worst installation issues (thanks to @darobin).
 - ***0.0.9*** - fix broken release
 - ***0.1.0*** - complete rewrite to support scraperJSON v0.1
+- ***0.1.1*** - fixes for regexes, definition checking, cleanup logging
+- ***0.1.2*** - fix bug in resolving relative paths, update dependencies, bring xpath dependency into local control to avoid a namespace-related regression in the main fork, and fix follow-ons.
 
 ## License
 Copyright (c) 2014 [Shuttleworth Foundation](https://www.shuttleworthfoundation.org/).

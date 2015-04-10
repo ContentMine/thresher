@@ -43,8 +43,7 @@
     "spooky": "~0.2.4",
     "tough-cookie": "^0.12.1",
     "underscore-deep-extend": "0.0.5",
-    "which": "~1.0.5",
-    "xpath": "0.0.6"
+    "which": "~1.0.5"
   },
   "devDependencies": {
     "coveralls": "~2.11.1",

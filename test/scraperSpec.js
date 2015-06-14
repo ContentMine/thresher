@@ -43,11 +43,11 @@ describe("Scraper", function() {
           }
         }
       ];
+      var passes = 0;
       for (var i in defs) {
         var def = defs[i];
-        (function() {
-          new Scraper(def);
-        }).should.throwError(/^invalid ScraperJSON/);
+        var scraper = new Scraper(def);
+        scraper.valid.should.be.false;
       }
     });
 
@@ -265,7 +265,7 @@ describe("Scraper", function() {
         result[0].should.equal('October 03, 2011');
         done();
       });
-      
+
       scraper.scrapeElement(doc, scraper.elementsArray[0]);
     });
 

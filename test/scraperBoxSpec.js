@@ -35,9 +35,7 @@ describe("ScraperBox", function() {
         }
       };
       var sb = new ScraperBox();
-      (function() {
-        sb.addScraper(s);
-      }).should.throw(/invalid ScraperJSON definition/);
+      sb.addScraper(s).should.be.false;
     });
 
   });
